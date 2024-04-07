@@ -303,7 +303,7 @@ int main(int argc, char *argv[]) {
 
                 fclose(fptr);
             }
-        } else if (strncmp(buffer, "PATCH /patchTask ", 17) == 0) {
+        } else if (strncmp(buffer, "PUT /putTask ", 13) == 0) {
             start = strstr(buffer, "\"id\":\"");
             if (start == NULL || *(start + 6) == '\"') {
                     sprintf(err, "{\"error\":\"Bad post string\"}");
