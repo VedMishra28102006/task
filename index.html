@@ -196,8 +196,8 @@
                 el.innerHTML = `<button>ok</button><input type="text" value="${val}" id="editInput${taskId}" />`;
                 el.children[0].addEventListener("click", () => {
                     newVal = el.children[1].value;
-                    fetch("/patchTask", {
-                        method: "PATCH",
+                    fetch("/putTask", {
+                        method: "PUT",
                         body: JSON.stringify({id: taskId, newValue: newVal})
                     }).then(response => response.json()).then(data => {
                         if(data.error){
