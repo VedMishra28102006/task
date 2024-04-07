@@ -1,0 +1,1 @@
+gcc server.c && ./a.out 8080

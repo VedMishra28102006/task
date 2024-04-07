@@ -1,0 +1,260 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>task</title>
+        <meta
+            charset="UTF-8"
+            name="viewport"
+            http-equiv="X-UA-Compatible"
+            content="width=device-width, initial-scale=1.0, user-scalable=no, ie=edge"
+        />
+        <style>
+            body {
+                user-select: none;
+                background-color: rgba(17, 17, 17, 1);
+                color: rgba(255, 255, 255, 1);
+                font-family: Arial, sans-serif;
+            }
+
+            main {
+                border: 5px solid rgba(0, 204, 255, 1);
+                border-radius: 10px;
+                background-image: linear-gradient(to bottom, rgba(0, 51, 102, 1), rgba(0, 0, 0, 1));
+                box-shadow: 0 0 10px rgba(0, 204, 255, 0.5);
+            }
+
+            #fixedHeader {
+                display: flex;
+                flex-direction: row;
+                background-image: linear-gradient(to right, rgba(0, 51, 102, 1), rgba(0, 0, 0, 1));
+                position: sticky;
+                top: 0;
+                z-index: 1;
+            }
+
+            #taskList {
+                display: flex;
+                flex-direction: column;
+                text-align: center;
+                transition: all 0.3s ease;
+                max-height: 300px;
+                overflow-y: auto;
+            }
+
+            #fixedHeader > h4 {
+                margin: 0;
+                color: rgba(204, 255, 255, 1);
+                padding: 10px;
+                font-size: 24px;
+            }
+
+            #fixedHeader > input,
+            #taskList > small > input {
+                flex: 2;
+                outline: none;
+                text-align: center;
+                background-color: rgba(34, 34, 34, 1);
+                color: rgba(255, 255, 255, 1);
+                border: 2px solid rgba(0, 204, 255, 1);
+                padding: 8px 12px;
+                margin: 5px 0;
+                font-size: 16px;
+                transition: all 0.3s ease;
+            }
+
+            #fixedHeader > button,
+            #taskList > small > button {
+                border: 0;
+                color: rgba(255, 255, 255, 1);
+                background-color: rgba(0, 102, 204, 1);
+                padding: 8px 16px;
+                margin: 5px;
+                border-radius: 5px;
+                box-shadow: 0 0 10px rgba(0, 204, 255, 0.5);
+                transition: all 0.3s ease;
+            }
+
+            #fixedHeader > button:hover,
+            #taskList > small > button:hover {
+                background-color: rgba(0, 76, 153, 1);
+            }
+
+            #taskList > small {
+                display: flex;
+                align-items: center;
+                justify-content: space-between;
+                transition: all 0.3s ease;
+                border-top: 3px solid rgba(0, 204, 255, 1);
+                padding: 10px;
+            }
+
+            #taskList > small > b {
+                flex: 2;
+                color: rgba(255, 255, 255, 1);
+                font-size: 18px;
+            }
+            @keyframes glideIn {
+                0% {
+                    opacity: 0;
+                    transform: translateY(-20px);
+                }
+                100% {
+                    opacity: 1;
+                    transform: translateY(0);
+                }
+            }
+
+            #taskList > small {
+                animation: glideIn 0.5s ease forwards;
+            }
+
+            @keyframes neonGlow {
+                0% {
+                    text-shadow: 0 0 5px rgba(0, 204, 255, 1), 0 0 10px rgba(0, 204, 255, 1), 0 0 20px rgba(0, 204, 255, 1);
+                }
+                50% {
+                    text-shadow: 0 0 10px rgba(0, 204, 255, 1), 0 0 20px rgba(0, 204, 255, 1), 0 0 30px rgba(0, 204, 255, 1);
+                }
+                100% {
+                    text-shadow: 0 0 5px rgba(0, 204, 255, 1), 0 0 10px rgba(0, 204, 255, 1), 0 0 20px rgba(0, 204, 255, 1);
+                }
+            }
+
+            @keyframes errorGlow {
+                0% {
+                    text-shadow: 0 0 5px rgba(255, 104, 104, 1), 0 0 10px rgba(255, 104, 104, 1), 0 0 20px rgba(255, 104, 104, 1);
+                }
+                50% {
+                    text-shadow: 0 0 10px rgba(255, 104, 104, 1), 0 0 20px rgba(255, 104, 104, 1), 0 0 30px rgba(255, 104, 104, 1);
+                }
+                100% {
+                    text-shadow: 0 0 5px rgba(255, 104, 104, 1), 0 0 10px rgba(255, 104, 104, 1), 0 0 20px rgba(255, 104, 104, 1);
+                }
+            }
+
+            #taskList > small > input,
+            #fixedHeader > input {
+                animation: neonGlow 1.5s infinite alternate;
+            }
+        </style>
+    </head>
+    <body>
+        <main>
+            <div id="fixedHeader">
+                <h4>Tasks</h4>
+                <input type="text" id="taskInput" />
+                <button>+</button>
+            </div>
+            <div id="taskList"></div>
+        </main>
+        <script>
+            var taskList = document.getElementById("taskList");
+            var fixedHeader = document.getElementById("fixedHeader");
+
+            fixedHeader.children[2].addEventListener("click", ()=>{post(fixedHeader.children[1].value)});
+
+            taskList.addEventListener("scroll", function() {
+                if (taskList.scrollTop > 0) {
+                    fixedHeader.style.borderBottom = "2px solid rgba(0, 204, 255, 1)";
+                    fixedHeader.style.boxShadow = "0 2px 5px rgb(0, 0, 0, 1)";
+                } else {
+                    fixedHeader.style.borderBottom = "none";
+                    fixedHeader.style.boxShadow = "none";
+                }
+            });
+
+            var createTask = (id, val) => {
+                var task = document.createElement("small");
+                task.id = id;
+                task.innerHTML = `
+                    <button onclick="updateTask('${id}')">/</button>
+                    <b>${val}</b>
+                    <button onclick="deleteTask('${id}')">-</button>
+                `;
+                taskList.appendChild(task);
+            };
+
+            var deleteTask = (taskId) => {
+                fetch("/deleteTask", {
+                    method: "DELETE",
+                    body: JSON.stringify({id: taskId})
+                }).then(response => response.json()).then(data => {
+                    if(data.error){
+                        alert(data.error);
+                    } else if(data.success) {
+                        document.getElementById(taskId).remove();
+                    }
+                });
+            };
+
+            var updateTask = (taskId) => {
+                var el = document.getElementById(taskId);
+                var val = "";
+                for(var i=2;i < el.innerText.length-2; i++){
+                    val += el.innerText[i];
+                }
+                el.innerHTML = `<button>ok</button><input type="text" value="${val}" id="editInput${taskId}" />`;
+                el.children[0].addEventListener("click", () => {
+                    newVal = el.children[1].value;
+                    fetch("/patchTask", {
+                        method: "PATCH",
+                        body: JSON.stringify({id: taskId, newValue: newVal})
+                    }).then(response => response.json()).then(data => {
+                        if(data.error){
+                            alert(data.error);
+                            if(data.field){
+                                document.getElementById(data.field).style.cssText = `
+                                    color: rgba(255, 50, 50, 1);
+                                    border: 2px solid rgba(255, 50, 50, 1);
+                                    animation: errorGlow 1.5s infinite alternate;
+                                `;
+                            }
+                        } else if(data.success){
+                            el.innerHTML = `
+                                <button onclick="updateTask('${taskId}')">/</button>
+                                <b>${newVal}</b>
+                                <button onclick="deleteTask('${taskId}')">-</button>
+                            `;
+                        }
+                    });
+                });
+            };
+
+            fetch("/getTasks", {method: "GET"}).then(response => response.text()).then(data => {
+                const parser = new DOMParser();
+                const xml = parser.parseFromString(data, "application/xml");
+                if(xml){
+                    const items = xml.getElementsByTagName("task");
+                    for(var i=0; i < items.length; i++){
+                        createTask(items[i].children[0].textContent, items[i].children[1].textContent);
+                    }
+                }
+            }).catch(err => alert(err));
+
+            post = (val) => {
+                fetch("/postTask", {
+                    method: "POST", 
+                    body: JSON.stringify({value: val})
+                }).then(response => response.json()).then(data => {
+                    if(data.error){
+                        alert(data.error);
+                        if(data.field){
+                            document.getElementById(data.field).style.cssText = `
+                                color: rgba(255, 50, 50, 1);
+                                border: 2px solid rgba(255, 50, 50, 1);
+                                animation: errorGlow 1.5s infinite alternate;
+                            `;
+                        }
+                    } else if(data.success && data.id){
+                        createTask(data.id, val);
+                        document.getElementById("taskInput").style.cssText = `
+                            color: rgba(255, 255, 255, 1);
+                            border: 2px solid rgba(0, 204, 255, 1);
+                            animation: neonGlow 1.5s infinite alternate;
+                        `;
+                    }
+                });
+            };
+        </script>
+    </body>
+</html>
