@@ -81,7 +81,7 @@ int main(int argc, char *argv[]) {
         error("Unable to bind");
     }
 
-    listen(sockfd, 5);
+    listen(sockfd, 1);
     printf("Serving on port: %d\n", portno);
 
     clilen = sizeof(cli_addr);
