@@ -190,7 +190,7 @@
             var updateTask = (taskId) => {
                 var el = document.getElementById(taskId);
                 var val = "";
-                for(var i=2;i < el.innerText.length-2; i++){
+                for(var i=4;i < el.innerText.length-2; i++){
                     val += el.innerText[i];
                 }
                 el.innerHTML = `<button>ok</button><input type="text" value="${val}" id="editInput${taskId}" />`;
