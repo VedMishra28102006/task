@@ -70,6 +70,9 @@ int main(int argc, char *argv[]) {
         error("Unable to open socket");
     }
 
+    int optval = 1;
+    setsockopt(sockfd, SOL_SOCKET, SO_REUSEADDR, &optval, sizeof(optval));
+
     bzero((char *)&serv_addr, sizeof(serv_addr));
     portno = atoi(argv[1]);
 
